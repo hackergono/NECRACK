@@ -14,63 +14,57 @@ from telegram.ext import (
     ApplicationBuilder, CommandHandler, MessageHandler, CallbackQueryHandler, ContextTypes, filters
 )
 
-# --- 🛰️ SHADOW HEARTBEAT (Railway Keep-Alive) ---
+# --- 🛰️ RAILWAY NEURAL LINK (Keep-Alive) ---
 def run_heartbeat():
     port = int(os.environ.get("PORT", 8080))
     class HealthCheckHandler(http.server.SimpleHTTPRequestHandler):
         def do_GET(self):
             self.send_response(200)
             self.end_headers()
-            self.wfile.write(b"GHOST_ENGINE_CORE_OPERATIONAL")
+            self.wfile.write(b"GHOST_CORE_V16_STABLE")
         def log_message(self, format, *args): return
     try:
         socketserver.TCPServer.allow_reuse_address = True
         with socketserver.TCPServer(("", port), HealthCheckHandler) as httpd:
-            print(f"📡 System Beacon Active on Port {port}")
             httpd.serve_forever()
-    except Exception as e:
-        print(f"❌ Heartbeat Failure: {e}")
+    except: pass
 
 threading.Thread(target=run_heartbeat, daemon=True).start()
 
-# --- ⚙️ SHADOW CONFIG ---
-# This pulls the token you provided from Railway's environment variables
+# --- ⚙️ ENCRYPTED CONFIG ---
 TOKEN = os.environ.get("TOKEN")
 SIS_URL = "http://115.241.194.20/sis/Examination/Reports/StudentSearchHTMLReport_student.aspx?R={id}&T=-8584723613578166740"
 RESULT_BASE_URL = "https://narayanagroup.co.in/patient/EngAutonomousReport.aspx/{id}"
 
-# Spoofing headers to bypass basic firewalls
+# Cloaking Headers
 HEADERS = {
-    "User-Agent": f"GhostEngine/16.0 (X11; Kali; Linux x86_64) Intercept/{random.randint(100,999)}",
+    "User-Agent": f"GhostEngine/Exploit-V16 (X11; Kali; Linux x86_64) Protocol/7.1.{random.randint(10,99)}",
     "X-Forwarded-For": f"{random.randint(1,255)}.{random.randint(1,255)}.{random.randint(1,255)}.{random.randint(1,255)}"
 }
 
 client = httpx.AsyncClient(timeout=45.0, verify=False, headers=HEADERS)
 
-# --- 🛠️ CORE UTILS ---
+# --- 🛠️ OSINT UTILS ---
 def b64_encode(text):
     return base64.b64encode(text.encode('utf-8')).decode('utf-8')
 
 def get_acronym(name):
     excluded = ['AND', 'THE', 'OF', 'IN', 'FOR', 'WITH', 'BY', 'LAB', 'LABORATORY']
     words = [word for word in re.split(r'[\s\-]+', name) if word.upper() not in excluded]
-    if not words: return "SUB"
+    if not words: return "NULL"
     return "".join([word[0] for word in words if word]).upper()[:6]
 
-# --- 🤖 HANDLERS ---
+# --- 🤖 SHADOW OPERATORS ---
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     banner = (
         "```\n"
-        "   _______ _    _  ____   _____ _______ \n"
-        "  / ______| |  | |/ __ \\ / ____|__   __|\n"
-        " | |  ____| |__| | |  | | (___    | |   \n"
-        " | | |_  /|  __  | |  | |\\___ \\   | |   \n"
-        " | |__| | |  | | |__| |____) |  | |   \n"
-        "  \\_____|_|  |_|\\____/|_____/   |_|   \n"
+        "   ☠️  G H O S T _ E N G I N E  ☠️\n"
+        "   ----------------------------\n"
+        "   [ STATUS: SYSTEM BREACHING ]\n"
+        "   [ VECTOR: REMOTE_OVERFLOW  ]\n"
         "```\n"
-        "💀 **GHOST_ENGINE v16.0 ONLINE**\n"
-        "----------------------------\n"
-        "🎯 **AWAITING TARGET ID (Reg No):**"
+        "⚡ **AWAITING TARGET UID (Reg No):**\n"
+        "_Send ID to initiate exfiltration..._"
     )
     await update.message.reply_text(banner, parse_mode=ParseMode.MARKDOWN)
 
@@ -79,16 +73,18 @@ async def handle_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["reg"] = reg
     
     # Visual Hack Sequence
-    log = await update.message.reply_text("`[!] INITIALIZING EXPLOIT...`", parse_mode=ParseMode.MARKDOWN)
-    await asyncio.sleep(0.5)
-    await log.edit_text("`[!] TUNNELING THROUGH PORTAL...`")
+    log = await update.message.reply_text("`[!] SPOOFING IP...`", parse_mode=ParseMode.MARKDOWN)
+    await asyncio.sleep(0.4)
+    await log.edit_text("`[!] OVERRIDING PORTAL FIREWALL...`")
+    await asyncio.sleep(0.4)
+    await log.edit_text("`[!] EXFILTRATING SUBJECT_DATA...`")
     
     encoded_id = b64_encode(reg)
     try:
         r = await client.get(SIS_URL.format(id=encoded_id))
         soup = BeautifulSoup(r.text, 'html.parser')
         
-        name = "UNKNOWN_SUBJECT"
+        name = "CLASSIFIED"
         name_tag = soup.find(string=re.compile("NAME", re.I))
         if name_tag:
             name = name_tag.find_parent('td').find_next_sibling('td').get_text(strip=True)
@@ -96,38 +92,39 @@ async def handle_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await log.delete()
         
         intel = (
-            f"🔓 **TARGET INTERCEPTED**\n"
+            f"🔓 **TARGET ASSET ACQUIRED**\n"
             f"━━━━━━━━━━━━━━━━━━━━\n"
-            f"👤 **NAME:** `{name}`\n"
+            f"👤 **ALIAS:** `{name}`\n"
             f"🆔 **UID:** `{reg}`\n"
-            f"📡 **VECTOR:** `DIRECT_SCRAPE_v16`"
+            f"🛡️ **THREAT:** `LEVEL_{random.randint(1,5)}`"
         )
         
         kb = [
-            [InlineKeyboardButton("📊 ATTENDANCE", callback_data="att"), InlineKeyboardButton("🏆 GRADES", callback_data="res")],
-            [InlineKeyboardButton("💰 FINANCIALS", callback_data="fee")],
-            [InlineKeyboardButton("🧹 WIPE SESSION", callback_data="clear")]
+            [InlineKeyboardButton("📊 INTERCEPT ATTENDANCE", callback_data="att")],
+            [InlineKeyboardButton("🏆 DUMP GRADE_REPORTS", callback_data="res")],
+            [InlineKeyboardButton("💰 EXTRACT FINANCIALS", callback_data="fee")],
+            [InlineKeyboardButton("💀 PURGE TRACES", callback_data="clear")]
         ]
         
         await update.message.reply_text(intel, reply_markup=InlineKeyboardMarkup(kb), parse_mode=ParseMode.MARKDOWN)
     except Exception:
-        await log.edit_text("❌ `TARGET UPLINK FAILED: PORTAL TIMEOUT`")
+        await log.edit_text("❌ `CRITICAL_FAILURE: Node Connection Dropped.`")
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     reg = context.user_data.get("reg")
-    if not reg: return await query.answer("❌ SESSION EXPIRED")
+    if not reg: return await query.answer("❌ SESSION_EXPIRED")
     
-    await query.answer("DECRYPTING DATA...")
+    await query.answer("DECRYPTING PACKETS...")
     encoded_id = b64_encode(reg)
 
     if query.data == "res":
         r = await client.get(RESULT_BASE_URL.format(id=encoded_id))
         soup = BeautifulSoup(r.text, 'html.parser')
         
-        transcript = "```\n+-- [ TARGET_GRADES ] --+\n"
-        transcript += "| SUB    | G | STATUS   |\n"
-        transcript += "+--------+---+----------+\n"
+        transcript = "```\n+--- [ CORE_TRANSCRIPT ] ---+\n"
+        transcript += "| CODE    | G | STATUS     |\n"
+        transcript += "+---------+---+------------+\n"
         
         found, backlogs = False, 0
         for row in soup.find_all('tr'):
@@ -137,25 +134,26 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 grd = cols[3].get_text(strip=True).upper()
                 if not sub or "SUB" in sub.upper() or len(grd) > 2: continue
                 
-                # PASS/FAIL BINARY LOGIC
                 is_fail = grd in ["F", "AB", "FAIL", "W"]
                 status = "❌ BREACHED" if is_fail else "✅ CLEARED"
                 if is_fail: backlogs += 1
                 
-                transcript += f"| {get_acronym(sub).ljust(6)} | {grd.ljust(1)} | {status.ljust(8)} |\n"
+                transcript += f"| {get_acronym(sub).ljust(7)} | {grd.ljust(1)} | {status.ljust(10)} |\n"
                 found = True
         
-        transcript += "+-----------------------+```"
+        transcript += "+--------------------------+```"
         
-        sgpa_match = re.search(r"SGPA\s*[:]?\s*(\d+\.\d+)", soup.get_text(), re.I)
+        full_text = soup.get_text(separator=" ")
+        sgpa_match = re.search(r"SGPA\s*[:]?\s*(\d+\.\d+)", full_text, re.I)
         sgpa = sgpa_match.group(1) if sgpa_match else "0.00"
-        verdict = "🔴 [ COMPROMISED ]" if backlogs > 0 else "🟢 [ SECURE ]"
+        
+        verdict = "🔴 [ SYSTEM_STATE: COMPROMISED ]" if backlogs > 0 else "🟢 [ SYSTEM_STATE: SECURE ]"
 
         res_msg = (
             f"🏆 **EXFILTRATION COMPLETE**\n"
             f"📈 **SGPA:** `{sgpa}` | ⚠️ **BL:** `{backlogs}`\n"
             f"{verdict}\n\n"
-            f"{transcript if found else '`[!] NO DATA PACKETS FOUND`'}"
+            f"{transcript if found else '`[!] ENCRYPTED DATA NOT FOUND`'}"
         )
         await query.message.reply_text(res_msg, parse_mode=ParseMode.MARKDOWN)
 
@@ -163,13 +161,13 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         r = await client.get(SIS_URL.format(id=encoded_id))
         val = re.search(r"Attendance\s*(\d+\.\d+)", r.text, re.I)
         perc = val.group(1) if val else "0.0"
-        alert = "🚨 LOW_STAMINA" if float(perc) < 75 else "🛡️ FORTIFIED"
+        alert = "🚨 CRITICAL_LEAK" if float(perc) < 75 else "🛡️ FULLY_ARMED"
         await query.message.reply_text(f"📊 **SURVEILLANCE:** `{perc}%` | {alert}", parse_mode=ParseMode.MARKDOWN)
 
     elif query.data == "fee":
         r = await client.get(SIS_URL.format(id=encoded_id))
         soup = BeautifulSoup(r.text, 'html.parser')
-        report = "💰 **FINANCIAL LEDGER DUMP**\n━━━━━━━━━━━━━━━\n"
+        report = "💰 **FINANCIAL_EXTRACT**\n━━━━━━━━━━━━━━━\n"
         found_fee = False
         for y in ["I-BTECH", "II-BTECH", "III-BTECH", "IV-BTECH"]:
             h = soup.find(string=re.compile(f"FEE DETAILS\s*\({y}\)", re.I))
@@ -181,13 +179,13 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     report += f"📅 **{y}**: `P: ₹{p.group(1)}` | `B: ₹{b.group(1)}`\n"
                     found_fee = True
                 except: pass
-        await query.message.reply_text(report if found_fee else "❌ `NO FINANCIAL DATA`", parse_mode=ParseMode.MARKDOWN)
+        await query.message.reply_text(report if found_fee else "❌ `NO FINANCIAL ASSETS DETECTED`", parse_mode=ParseMode.MARKDOWN)
 
     elif query.data == "clear":
-        await query.message.edit_text("`[!] SYSTEM PURGED. EVIDENCE REMOVED.`")
+        await query.message.edit_text("`[!] TRACES WIPED. GHOST MODE ACTIVE.`")
 
 if __name__ == "__main__":
-    print("💀 GHOST_ENGINE ONLINE. COMMENCING OPERATION...")
+    print("💀 GHOST_ENGINE_V16 INITIALIZED. OPERATING UNDER SHADOW PROTOCOL...")
     app = ApplicationBuilder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_input))
